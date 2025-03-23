@@ -1,5 +1,4 @@
 import fetchData from "./fetchData.js";
-import "./style.css";
 const body = document.querySelector("body");
 const input = document.querySelector("input");
 const submit = document.querySelector(".submit");
