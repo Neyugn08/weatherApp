@@ -15,6 +15,7 @@ body {
     justify-content: center;
     align-items: center;
     background-color: black;
+    background-size: cover;
 }
 
 .searchBar {
@@ -53,6 +54,7 @@ body {
 
 .displayWindow {
     border: 1px solid black;
+    opacity: 0.5;
     border-radius: 4px;
     background: white;
     width : 100%;

@@ -1,6 +1,6 @@
 export default async function fetchData(location, unit) {
     try {
-        const link = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}?key=PKFFMMP8UB9DSZMJ9835283NC&unitGroup=${unit}`;
+        const link = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}?key=PKFFMMP8UB9DSZMJ9835283NC&unitGroup=${unit}&include=current`;
         const data = await fetch(link, {
             mode: "cors"
         })
