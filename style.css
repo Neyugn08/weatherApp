@@ -14,10 +14,11 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background-color: black;
 }
 
 .searchBar {
-    width: 50%;
+    width: 70%;
     display: flex;
     gap: 0px;
 }
@@ -32,7 +33,7 @@ body {
 }
 
 .conversion {
-    width: 50%;
+    width: 70%;
     display: flex; 
     gap: 0px;
 }
@@ -43,8 +44,40 @@ body {
     width: 50%;
     display: flex;
     justify-content: center;
+    background-color: white;
 }
 
 .container {
-    width: 50%;
+    width: 70%;
+}
+
+.displayWindow {
+    border: 1px solid black;
+    border-radius: 4px;
+    background: white;
+    width : 100%;
+    height: 50vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3px;
+}
+
+.displayWindow > div {
+    display: inline-grid;
+    flex-direction: column;
+    font-size: 1rem;
+}
+
+.left {
+    grid-column: 1 / 2;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.right {
+    grid-column: 2 / 3;
 }
