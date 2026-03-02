@@ -8,6 +8,10 @@ input:focus {
     outline: none;
 }
 
+button:hover, .C:hover, .F:hover {
+    opacity: 90%;
+}
+
 body {
     min-height: 100vh;
     display: flex;
