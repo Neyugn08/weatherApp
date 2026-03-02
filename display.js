@@ -1,60 +1,69 @@
 import fetchData from "./fetchData.js";
+// Select elements
 const body = document.querySelector("body");
 const input = document.querySelector("input");
 const submit = document.querySelector(".submit");
 const c = document.querySelector(".C");
 const f = document.querySelector(".F");
 const container = document.querySelector(".container");
-class displayData {
+
+class DisplayData {
     constructor() {
         this.status = true;
         this.unit = "metric";
     }
-    createData(location, unit) {
-        if (location.length == 0) {
-            this.status = true;
-            return;
-        }
+    validInput(input) {
+        if (input.length == 0) return false;
         // Ensuring the functionl only works once at a time
-        if (this.status == false) return;
+        if (!this.status) return false;
         this.status = false;
+        return true;
+    }
+    // DOM manipulation
+    updateUI(data) {
+        const unit = this.unit;
+        if (unit == "metric") {
+            c.style.background = "rgb(241, 244, 90)";
+            f.style.background = "white";
+        }
+        else if (unit == "us") {
+            f.style.background = "rgb(138, 219, 246)";
+            c.style.background = "white";
+        }
         container.innerHTML = "";
-        fetchData(location, unit)
+        const displayWindow = document.createElement("div");
+        displayWindow.setAttribute("class", "displayWindow");
+        this.formatData(displayWindow, data);
+        container.appendChild(displayWindow);
+        // Change the background correspondingly
+        this.changeBackground(data.precipprob);
+    }
+    createData(location) {
+        const unit = this.unit;
+        if (!this.validInput(location)) return false;
+        return fetchData(location, unit)
         .then((response) => {
             this.status = true;
-            if (response == "No data found") return;
-            // DOM manipulation
-            const displayWindow = document.createElement("div");
-            displayWindow.setAttribute("class", "displayWindow");
-            console.log(response);
-            this.formatData(displayWindow, response);
-            container.appendChild(displayWindow);
-            // Change the background correspondingly
-            this.changeBackground(response.precipprob);
+            if (response == "No data found") return false;
+            return response;
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+            this.status = true;
+            console.log(error);
+            return false;
+        });    
     }
-    changeUnit(location, type) {
+    changeUnit(type) {
         if (type == "C") this.unit = "metric";
         else if (type == "F") this.unit = "us";
-        this.createData(location, this.unit);
     }
-    showData(button, location) {
-        console.log(`this status: ${this.status}`);
-        if (this.status == true) {
-            if (button == submit) {
-                this.createData(location, this.unit);
-            }
-            else if (button == c) {
-                button.style.background = "rgb(241, 244, 90)";
-                f.style.background = "white";
-                this.changeUnit(location, "C");
-            }
-            else if (button == f) {
-                button.style.background = "rgb(138, 219, 246)";
-                c.style.background = "white";
-                this.changeUnit(location, "F");
-            } 
+    async showData(button, location) {
+        if (this.status) {
+            if (button == c) this.changeUnit("C");
+            else if (button == f) this.changeUnit("F");
+            else if (button != submit) return;
+            const data = await this.createData(location);
+            if (data) this.updateUI(data);
         }
     }
     formatData(where, response) {
@@ -97,17 +106,16 @@ class displayData {
     }
     changeBackground(weather) {
         let str = null;
-        console.log(Number.parseInt(weather));
         if (Number.parseInt(weather) >= 30) str = "a rain";
         else str = "blazing sun";
-        fetch(`https://api.unsplash.com/photos/random?query=${str}&client_id=${'0ZThRkoD_yZyhcActSKTGHNDCqcMR8JD_5g8mcCZsdY'}`, {mode: "cors"})
+        const key = "0ZThRkoD_yZyhcActSKTGHNDCqcMR8JD_5g8mcCZsdY"
+        fetch(`https://api.unsplash.com/photos/random?query=${str}&client_id=${key}`, {mode: "cors"})
         .then((response) => {
             if (!response.ok) body.style.background = "black";
             else return response.json();
         })
         .then((response) => {
             if (response == undefined) return;
-            console.log(response);
             body.style.background = `url(${response.urls.regular})`;
         })
         .catch((error) => {
@@ -116,7 +124,8 @@ class displayData {
         });
     }
 }
-const panel = new displayData();
+
+const panel = new DisplayData();
 body.addEventListener("click", (e) => {
     panel.showData(e.target, input.value);
 });
