@@ -1,4 +1,5 @@
 import fetchData from "./fetchData.js";
+import changeBackground from "./changeBackground.js";
 // Select elements
 const body = document.querySelector("body");
 const input = document.querySelector("input");
@@ -12,15 +13,16 @@ class DisplayData {
         this.status = true;
         this.unit = "metric";
     }
+    // Validate the input
     validInput(input) {
         if (input.length == 0) return false;
-        // Ensuring the functionl only works once at a time
+        // Ensure the function only works once at a time
         if (!this.status) return false;
         this.status = false;
         return true;
     }
-    // DOM manipulation
     updateUI(data) {
+        // Modify unit button's color
         const unit = this.unit;
         if (unit == "metric") {
             c.style.background = "rgb(241, 244, 90)";
@@ -30,13 +32,14 @@ class DisplayData {
             f.style.background = "rgb(138, 219, 246)";
             c.style.background = "white";
         }
+        // Update the UI using fetched data
         container.innerHTML = "";
         const displayWindow = document.createElement("div");
         displayWindow.setAttribute("class", "displayWindow");
         this.formatData(displayWindow, data);
         container.appendChild(displayWindow);
         // Change the background correspondingly
-        this.changeBackground(data.precipprob);
+        changeBackground(data.precipprob);
     }
     createData(location) {
         const unit = this.unit;
@@ -67,61 +70,39 @@ class DisplayData {
         }
     }
     formatData(where, response) {
-        let distUnit = null;
-        if (this.unit == "metric") distUnit = "km/h";
-        else if (this.unit == "us") distUnit = "mile/h";
-        const displayName = ["Day", "Description", "Condition", "Temperature", "Humidity", "Rain probability", "Wind speed"];
-        const displayThings = ["datetime", "description", "conditions","temp", "humidity", "precipprob", "windspeed"];
+        // Set the unit displayed on the data
+        let displayUnit = this.unit == "metric" ? "km/h" : "mile/h"; 
+        // Pairs of (displayed name, corresponding name as key of response)
+        const pairs = [["Day", "datetime"] , ["Description", "description"], ["Condition", "conditions"], ["Temperature", "temp"], ["Humidity", "humidity"], ["Rain probability", "precipprob"], ["Wind speed", "windspeed"]];
+        // Divide the display area into 2 regions: left and right
         const right = document.createElement("div");
         right.setAttribute("class", "right");
         const left = document.createElement("div");
         left.setAttribute("class", "left");
-        for (let i = 0, l = displayThings.length; i < l; i++) {
+        for (let i = 0, l = pairs.length; i < l; i++) {
+            // Add a new weather property to their corresponding region
             const tmp = document.createElement("div");
-            tmp.style.display = "flex";
-            tmp.style.justifyContent = "center";
-            tmp.style.alignItems = "center";
-            tmp.style.padding = "0px 8px";
-            tmp.style.fontSize = "50%";
+            tmp.setAttribute("class", "tmp");
             if (i < l / 2 - 1) right.appendChild(tmp);
             else left.appendChild(tmp);
-            // Specilising for each properties
-            let str = `${displayName[i]}: ${response[displayThings[i]]}`;
-            if (displayThings[i] == "temp") {
-                tmp.style.gridArea = "1 / 1 / -1 / 1";
-                tmp.style.fontSize = "80%";
-                if (this.unit == "metric") tmp.textContent = response[displayThings[i]] + c.textContent;
-                else tmp.textContent = response[displayThings[i]] + f.textContent;
+            // Apply specific formats for properties
+            const key = pairs[i][1];
+            let str = `${pairs[i][0]}: ${response[key]}`;
+            if (key == "temp") {
+                tmp.setAttribute("id", "temp");
+                if (this.unit == "metric") tmp.textContent = response[key] + c.textContent;
+                else tmp.textContent = response[key] + f.textContent;
             }
-            else if (displayThings[i] == "windspeed") {
-                tmp.textContent = str + distUnit;
+            else if (key == "windspeed") {
+                tmp.textContent = str + displayUnit;
             }
-            else if (displayThings[i] == "precipprob" || displayThings[i] == "humidity") {
+            else if (key == "precipprob" || key == "humidity") {
                 tmp.textContent = str + "%";
             }
             else tmp.textContent = str;
         }
         where.appendChild(left);
         where.appendChild(right);
-    }
-    changeBackground(weather) {
-        let str = null;
-        if (Number.parseInt(weather) >= 30) str = "a rain";
-        else str = "blazing sun";
-        const key = "0ZThRkoD_yZyhcActSKTGHNDCqcMR8JD_5g8mcCZsdY"
-        fetch(`https://api.unsplash.com/photos/random?query=${str}&client_id=${key}`, {mode: "cors"})
-        .then((response) => {
-            if (!response.ok) body.style.background = "black";
-            else return response.json();
-        })
-        .then((response) => {
-            if (response == undefined) return;
-            body.style.background = `url(${response.urls.regular})`;
-        })
-        .catch((error) => {
-            console.log(error);
-            body.style.background = "black";
-        });
     }
 }
 

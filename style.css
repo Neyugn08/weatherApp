@@ -83,3 +83,16 @@ body {
 .right {
     grid-column: 2 / 3;
 }
+
+.tmp {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 8px;
+    font-size: 50%;
+}
+
+#temp {
+    grid-area: 1 / 1 / -1 / 1;
+    font-size: 80%;
+}
